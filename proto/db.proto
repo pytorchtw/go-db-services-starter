@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package grpc;
+
+service GrpcDB {
+    rpc CreatePage(CreatePageRequest) returns (CreatePageResponse) {}
+    rpc GetPage(GetPageRequest) returns (GetPageResponse) {}
+	rpc SayHello(SimpleRequest) returns (SimpleResponse) {}
+	//rpc LotsOfReplies(DBRequest) returns (stream DBResponse){}
+}
+
+message CreatePageRequest {
+	string url = 1;
+	string content = 2;
+}
+
+message CreatePageResponse {
+    string message = 1;
+    string id = 2;
+}
+
+message GetPageRequest {
+    string id = 1;
+    string url = 2;
+}
+
+message GetPageResponse {
+    string message = 1;
+    string url = 2;
+    string content = 3;
+}
+
+message SimpleRequest {
+	string message = 1;
+}
+
+message SimpleResponse {
+    string message = 1;
+}
