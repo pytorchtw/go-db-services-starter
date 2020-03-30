@@ -1,6 +1,7 @@
 # go-db-services-starter
 
 # start up docker postgresql db server
+# this will create a test database directory at ./db_data/test_db if not exists
 docker-compose up postgresql
 
 # create db migration scripts
