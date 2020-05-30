@@ -44,7 +44,7 @@ run grpc server
 go run ./cmd/grpc_server/main.go
 ```
 
-run grpc client t
+run grpc client
 ```
 go run ./cmd/grpc_client/main.go
 ```
