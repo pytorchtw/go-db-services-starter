@@ -379,7 +379,7 @@ func (q pageQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Page, e
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for pages")
+		return nil, errors.Wrap(err, "db_models: failed to execute a one query for pages")
 	}
 
 	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
@@ -395,7 +395,7 @@ func (q pageQuery) All(ctx context.Context, exec boil.ContextExecutor) (PageSlic
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to Page slice")
+		return nil, errors.Wrap(err, "db_models: failed to assign all query results to Page slice")
 	}
 
 	if len(pageAfterSelectHooks) != 0 {
@@ -418,7 +418,7 @@ func (q pageQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64,
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count pages rows")
+		return 0, errors.Wrap(err, "db_models: failed to count pages rows")
 	}
 
 	return count, nil
@@ -434,7 +434,7 @@ func (q pageQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if pages exists")
+		return false, errors.Wrap(err, "db_models: failed to check if pages exists")
 	}
 
 	return count > 0, nil
@@ -466,7 +466,7 @@ func FindPage(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from pages")
+		return nil, errors.Wrap(err, "db_models: unable to select from pages")
 	}
 
 	return pageObj, nil
@@ -476,7 +476,7 @@ func FindPage(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
 func (o *Page) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no pages provided for insertion")
+		return errors.New("db_models: no pages provided for insertion")
 	}
 
 	var err error
@@ -546,7 +546,7 @@ func (o *Page) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into pages")
+		return errors.Wrap(err, "db_models: unable to insert into pages")
 	}
 
 	if !cached {
@@ -581,7 +581,7 @@ func (o *Page) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("models: unable to update pages, could not build whitelist")
+			return 0, errors.New("db_models: unable to update pages, could not build whitelist")
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"pages\" SET %s WHERE %s",
@@ -604,12 +604,12 @@ func (o *Page) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 	var result sql.Result
 	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update pages row")
+		return 0, errors.Wrap(err, "db_models: unable to update pages row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by update for pages")
+		return 0, errors.Wrap(err, "db_models: failed to get rows affected by update for pages")
 	}
 
 	if !cached {
@@ -627,12 +627,12 @@ func (q pageQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all for pages")
+		return 0, errors.Wrap(err, "db_models: unable to update all for pages")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for pages")
+		return 0, errors.Wrap(err, "db_models: unable to retrieve rows affected for pages")
 	}
 
 	return rowsAff, nil
@@ -646,7 +646,7 @@ func (o PageSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 	}
 
 	if len(cols) == 0 {
-		return 0, errors.New("models: update all requires at least one column argument")
+		return 0, errors.New("db_models: update all requires at least one column argument")
 	}
 
 	colNames := make([]string, len(cols))
@@ -676,12 +676,12 @@ func (o PageSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all in page slice")
+		return 0, errors.Wrap(err, "db_models: unable to update all in page slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all page")
+		return 0, errors.Wrap(err, "db_models: unable to retrieve rows affected all in update all page")
 	}
 	return rowsAff, nil
 }
@@ -690,7 +690,7 @@ func (o PageSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
 func (o *Page) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no pages provided for upsert")
+		return errors.New("db_models: no pages provided for upsert")
 	}
 	if !boil.TimestampsAreSkipped(ctx) {
 		currTime := time.Now().In(boil.GetLocation())
@@ -753,7 +753,7 @@ func (o *Page) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 		)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert pages, could not build update column list")
+			return errors.New("db_models: unable to upsert pages, could not build update column list")
 		}
 
 		conflict := conflictColumns
@@ -796,7 +796,7 @@ func (o *Page) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert pages")
+		return errors.Wrap(err, "db_models: unable to upsert pages")
 	}
 
 	if !cached {
@@ -812,7 +812,7 @@ func (o *Page) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnCo
 // Delete will match against the primary key column to find the record to delete.
 func (o *Page) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("models: no Page provided for delete")
+		return 0, errors.New("db_models: no Page provided for delete")
 	}
 
 	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
@@ -829,12 +829,12 @@ func (o *Page) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, er
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete from pages")
+		return 0, errors.Wrap(err, "db_models: unable to delete from pages")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for pages")
+		return 0, errors.Wrap(err, "db_models: failed to get rows affected by delete for pages")
 	}
 
 	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
@@ -847,19 +847,19 @@ func (o *Page) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, er
 // DeleteAll deletes all matching rows.
 func (q pageQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("models: no pageQuery provided for delete all")
+		return 0, errors.New("db_models: no pageQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from pages")
+		return 0, errors.Wrap(err, "db_models: unable to delete all from pages")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for pages")
+		return 0, errors.Wrap(err, "db_models: failed to get rows affected by deleteall for pages")
 	}
 
 	return rowsAff, nil
@@ -895,12 +895,12 @@ func (o PageSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (in
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from page slice")
+		return 0, errors.Wrap(err, "db_models: unable to delete all from page slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for pages")
+		return 0, errors.Wrap(err, "db_models: failed to get rows affected by deleteall for pages")
 	}
 
 	if len(pageAfterDeleteHooks) != 0 {
@@ -947,7 +947,7 @@ func (o *PageSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in PageSlice")
+		return errors.Wrap(err, "db_models: unable to reload all in PageSlice")
 	}
 
 	*o = slice
@@ -969,7 +969,7 @@ func PageExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, e
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if pages exists")
+		return false, errors.Wrap(err, "db_models: unable to check if pages exists")
 	}
 
 	return exists, nil
